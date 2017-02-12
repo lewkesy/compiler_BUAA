@@ -1,0 +1,439 @@
+优化前的中间代码（四元式）
+li	32	$t3	 
+sw	0($s2)	$t3	 
++	$sp	$sp	0
++	$sp	$sp	0
+j	 	main	 
+getn:	 	 	 
+sw	4($sp)	$s0	 
++	$sp	$sp	4
+move	$sp	$s0	 
+sw	4($sp)	$ra	 
++	$sp	$sp	4
+sw	4($sp)	$s3	 
++	$sp	$sp	8
+move	$sp	$s3	 
+-	$t0	$s1	4
++	$sp	$t0	$sp
++	$sp	$sp	4
+=	tmp	1	 
+BGTZ	label0	x	0
+li	0	$s4	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+j	 	label0	 
+label0:	 	 	 
+BLTZ	label1	x	1
++	$sp	$sp	4
+li	0	$s1	 
++	$sp	$sp	12
+-	@_0	x	1
++	$sp	$sp	4
+lw	0($s5)	$t0	 
+sw	0($sp)	$t0	 
+-	$sp	$sp	16
+lw	0($s5)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	getn	 
++	$t3	$s3	8
+sw	0($t3)	$s4	 
++	@_1	#_0	tmp
+lw	4($s5)	$s4	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+j	 	label1	 
+label1:	 	 	 
+li	0	$s4	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+dag:	 	 	 
+sw	4($sp)	$s0	 
++	$sp	$sp	4
+move	$sp	$s0	 
+sw	4($sp)	$ra	 
++	$sp	$sp	4
+sw	4($sp)	$s3	 
++	$sp	$sp	8
+move	$sp	$s3	 
+-	$t0	$s1	4
++	$sp	$t0	$sp
++	$sp	$sp	20
+=	x	0	 
+=	y	0	 
+=	z	0	 
+=	i	0	 
+label2:	 	 	 
++	$sp	$sp	4
+li	0	$s1	 
++	$sp	$sp	12
++	$sp	$sp	4
+lw	0($s2)	$t0	 
+sw	0($sp)	$t0	 
+-	$sp	$sp	16
+lw	0($s2)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	getn	 
++	$t3	$s3	20
+sw	0($t3)	$s4	 
+-	@_2	#_1	3
+BGEZ	label3	i	@_2
+lw	0($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	12($s5)	$t0	 
++	@_4	x	@_3
+=	x	@_4	 
++	@_5	i	1
+lw	20($s5)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	24($s5)	$t0	 
++	@_7	y	@_6
+=	y	@_7	 
++	@_8	i	2
+lw	32($s5)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	36($s5)	$t0	 
++	@_10	z	@_9
+=	z	@_10	 
++	@_11	i	3
+=	i	@_11	 
+j	 	label2	 
+label3:	 	 	 
+=	c	3	 
+=	i	0	 
+label4:	 	 	 
+BGEZ	label5	i	100
+*	@_12	x	c
++	@_13	@_12	z
+*	@_14	y	2
+-	@_15	@_13	@_14
+=	y	@_15	 
+*	@_16	x	c
+-	@_17	@_16	z
+*	@_18	y	2
++	@_19	@_17	@_18
+=	z	@_19	 
+*	@_20	x	c
++	@_21	@_20	z
+*	@_22	y	2
+-	@_23	@_21	@_22
+=	x	@_23	 
++	@_24	i	1
+=	i	@_24	 
+j	 	label4	 
+label5:	 	 	 
+la	msg1	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	4($s3)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+la	msg2	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	8($s3)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+la	msg3	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	12($s3)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+quicksort:	 	 	 
+sw	4($sp)	$s0	 
++	$sp	$sp	4
+move	$sp	$s0	 
+sw	4($sp)	$ra	 
++	$sp	$sp	4
+sw	4($sp)	$s3	 
++	$sp	$sp	8
+move	$sp	$s3	 
+-	$t0	$s1	4
++	$sp	$t0	$sp
++	$sp	$sp	12
++	$sp	$sp	4
+=	x	i	 
+=	y	j	 
++	@_25	x	y
+/	@_26	@_25	2
+lw	104($s5)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	108($s5)	$t0	 
+=	z	@_27	 
+label6:	 	 	 
+BGTZ	label12	x	y
+label7:	 	 	 
+lw	12($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	112($s5)	$t0	 
+BLEZ	label8	z	@_28
+-	@_29	y	1
+=	y	@_29	 
+j	 	label7	 
+label8:	 	 	 
+label9:	 	 	 
+lw	8($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	120($s5)	$t0	 
+BGEZ	label10	z	@_30
++	@_31	x	1
+=	x	@_31	 
+j	 	label9	 
+label10:	 	 	 
+BGTZ	label11	x	y
+lw	8($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	128($s5)	$t0	 
+=	tmp	@_32	 
+lw	12($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	132($s5)	$t0	 
+=	[x]list	@_33	 
+=	[y]list	tmp	 
++	@_34	x	1
+=	x	@_34	 
+-	@_35	y	1
+=	y	@_35	 
+j	 	label11	 
+label11:	 	 	 
+j	 	label6	 
+label12:	 	 	 
+BGEZ	label13	x	j
+lw	8($s3)	$t0	 
+sw	16($sp)	$t0	 
+lw	4($s3)	$t0	 
+sw	20($sp)	$t0	 
+li	8	$s1	 
+jal	 	quicksort	 
+j	 	label13	 
+label13:	 	 	 
+BGEZ	label14	i	y
+lw	0($s3)	$t0	 
+sw	16($sp)	$t0	 
+lw	12($s3)	$t0	 
+sw	20($sp)	$t0	 
+li	8	$s1	 
+jal	 	quicksort	 
+j	 	label14	 
+label14:	 	 	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+print_list:	 	 	 
+sw	4($sp)	$s0	 
++	$sp	$sp	4
+move	$sp	$s0	 
+sw	4($sp)	$ra	 
++	$sp	$sp	4
+sw	4($sp)	$s3	 
++	$sp	$sp	8
+move	$sp	$s3	 
+-	$t0	$s1	4
++	$sp	$t0	$sp
++	$sp	$sp	4
+=	i	0	 
+label15:	 	 	 
+BGEZ	label19	i	n
+BNE	label16	i	1
+la	msg4	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	4($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	144($s5)	$t0	 
+lw	144($s5)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+j	 	label16	 
+label16:	 	 	 
+BNE	label17	i	7
+la	msg5	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	4($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	148($s5)	$t0	 
+lw	148($s5)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+j	 	label17	 
+label17:	 	 	 
+BNE	label18	i	12
+la	msg6	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	4($s3)	$t0	 
+sll	2	$t0	$t0
++	$t0	$t0	$s2
+li	4	$t1	 
++	$t0	$t0	$t1
+lw	0($t0)	$t0	 
+sw	152($s5)	$t0	 
+lw	152($s5)	$a0	 
+li	1	$v0	 
+syscall	 	 	 
+j	 	label18	 
+label18:	 	 	 
++	@_39	i	1
+=	i	@_39	 
+j	 	label15	 
+label19:	 	 	 
+move	$s0	$sp	 
+lw	0($sp)	$t0	 
+move	$t0	$s0	 
+lw	4($sp)	$t0	 
+move	$t0	$ra	 
+lw	8($sp)	$t0	 
+move	$t0	$s3	 
+-	$sp	$sp	4
+jr	 	$ra	 
+main:	 	 	 
++	$sp	$sp	16
+move	$sp	$s3	 
+-	$sp	$sp	4
++	$sp	$sp	4
+=	i	0	 
+label20:	 	 	 
++	$sp	$sp	4
+li	0	$s1	 
++	$sp	$sp	12
++	$sp	$sp	4
+lw	0($s2)	$t0	 
+sw	0($sp)	$t0	 
+-	$sp	$sp	16
+lw	0($s2)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	getn	 
++	$t3	$s3	4
+sw	0($t3)	$s4	 
+BGEZ	label21	i	#_2
+*	@_40	i	99
+=	[i]list	@_40	 
++	@_41	i	2
+=	i	@_41	 
+j	 	label20	 
+label21:	 	 	 
+=	i	1	 
+label22:	 	 	 
++	$sp	$sp	4
+li	0	$s1	 
++	$sp	$sp	12
++	$sp	$sp	4
+lw	0($s2)	$t0	 
+sw	0($sp)	$t0	 
+-	$sp	$sp	16
+lw	0($s2)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	getn	 
++	$t3	$s3	8
+sw	0($t3)	$s4	 
+BGEZ	label23	i	#_3
+-	@_42	max_len	i
+*	@_43	@_42	99
+=	[i]list	@_43	 
++	@_44	i	2
+=	i	@_44	 
+j	 	label22	 
+label23:	 	 	 
+la	msg7	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	0($s2)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	print_list	 
+li	0	$t0	 
+sw	16($sp)	$t0	 
+-	@_45	max_len	1
+lw	180($s5)	$t0	 
+sw	20($sp)	$t0	 
+li	8	$s1	 
+jal	 	quicksort	 
+la	msg8	$a0	 
+li	4	$v0	 
+syscall	 	 	 
+lw	0($s2)	$t0	 
+sw	16($sp)	$t0	 
+li	4	$s1	 
+jal	 	print_list	 
+jal	 	dag	 

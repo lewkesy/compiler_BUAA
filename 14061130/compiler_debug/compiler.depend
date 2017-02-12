@@ -1,0 +1,49 @@
+# depslib dependency file v1.0
+1483099980 source:e:\compiler_codeblocks\compiler\main.c
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	<stdlib.h>
+	"error.h"
+	"getsym.h"
+	"valTable.h"
+	"statement.h"
+	"optimize.h"
+	"translate.h"
+
+1483177467 e:\compiler_codeblocks\compiler\error.h
+
+1483178161 e:\compiler_codeblocks\compiler\getsym.h
+
+1483103902 e:\compiler_codeblocks\compiler\valtable.h
+
+1483187857 e:\compiler_codeblocks\compiler\statement.h
+
+1483101738 e:\compiler_codeblocks\compiler\translate.h
+
+1483101827 e:\compiler_codeblocks\compiler\optimize.h
+
+1483616239 source:e:\compiler_codeblocks\compiler_debug\main.c
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	<stdlib.h>
+	"error.h"
+	"getsym.h"
+	"valTable.h"
+	"statement.h"
+	"optimize.h"
+	"translate.h"
+
+1483664565 e:\compiler_codeblocks\compiler_debug\error.h
+
+1483178161 e:\compiler_codeblocks\compiler_debug\getsym.h
+
+1483103902 e:\compiler_codeblocks\compiler_debug\valtable.h
+
+1483664689 e:\compiler_codeblocks\compiler_debug\statement.h
+
+1483661672 e:\compiler_codeblocks\compiler_debug\optimize.h
+
+1483660456 e:\compiler_codeblocks\compiler_debug\translate.h
+

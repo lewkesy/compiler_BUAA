@@ -1,0 +1,749 @@
+readme：
+由于第一次测试时DAG图的构造出现一些问题导致测试出错，现已修正，由于修改内容较多，在此列举出主要的修改点：
+1、statement.h：将语句列部分中
+   if(sencence() == 1 || sentence() == 2)
+   修改为
+   testtest = sentence();if(testtest == 1 || testtest = 2)
+2、optimize.h：将DAG图部分return2OTBL()函数中返回代码段修改为(从注释地方开始算起)
+                //如果val是算符，也就是说是中间节点
+                if((isNum(DagArray[i].val) != 1) &&
+                   (DagArray[i].val[0] == '+' ||
+                    DagArray[i].val[0] == '-' ||
+                    DagArray[i].val[0] == '*' ||
+                    DagArray[i].val[0] == '/')){
+                    //如果临时变量后面没有非临时变量
+                    findLRNode(leftNode,rightNode,DagArray[i].lnode,DagArray[i].rnode);
+                    //没有非临时变量
+                    if(ifVal(DagArray[i].node,DagArray[i].nodeNum) == -1){
+                        addOTBL1(DagArray[i].val,DagArray[i].node[0],leftNode,rightNode);
+                    }
+                    else{
+                        for(j = 0; j < DagArray[i].nodeNum; j++){
+                            if(DagArray[i].node[j][0] != '@')
+                                addOTBL1(DagArray[i].val,DagArray[i].node[j],leftNode,rightNode);
+                        }
+                    }
+                    restNode--;
+                    //删除子节点的父节点信息
+                    deleteFNode(DagArray[i].num,DagArray[i].lnode);
+                    deleteFNode(DagArray[i].num,DagArray[i].rnode);
+
+                    DagArray[i].finished = 1;
+                    if(DagArray[DagArray[i].lnode].fnodeNum == 0)
+                        i = DagArray[i].lnode;
+                    else{
+                        i = -1;
+                    }
+                }
+                else if(DagArray[i].fnodeNum == 0){
+                    //子节点
+                    if(DagArray[i].nodeNum == 1 && strcmp(DagArray[i].val,DagArray[i].node[0])){
+                        addOTBL1("=",DagArray[i].node[0],DagArray[i].val," ");
+                    }
+                    else if(DagArray[i].nodeNum != 1){
+                        for(j = 1 ; j < DagArray[i].nodeNum; j++){
+                            addOTBL1("=",DagArray[i].node[j],DagArray[i].val," ");
+                        }
+                    }
+                    DagArray[i].finished = 1;
+                    i = DagArray[i].lnode;
+                    restNode--;
+                }
+                else{
+                    i = -1;
+                }
+        }
+3、translate.h：为了解决溢出问题将add/sub修改为addu/subu
+
+
+编译运行结果：
+before:  3069 2475 1188 
+after:  2970 2376 1881
+x= -1210652497
+y= -1441707496
+z= 1220381132
+
+目标代码：
+ .data
+msg1:  .asciiz "x= "
+msg2:  .asciiz "y= "
+msg3:  .asciiz "z= "
+msg4:  .asciiz " "
+msg5:  .asciiz " "
+msg6:  .asciiz " "
+msg7:  .asciiz "before: "
+msg8:  .asciiz " after: "
+.text
+li $sp,0x10040000 
+li $s5,0x10000000 
+move $s2,$sp 
+addi $sp,$sp,152
+     
+li $t3 ,32
+sw $t3 ,0($s2)
+addi $sp,$sp,0
+j main  
+getn:    
+sw $s0 ,4($sp)
+addi $sp,$sp,4
+move $s0 ,$sp
+sw $ra ,4($sp)
+addi $sp,$sp,4
+sw $s3 ,4($sp)
+addi $sp,$sp,8
+move $s3 ,$sp
+lw $t7,0($s3) 
+lw $t8,4($s3) 
+li $t3,4 
+subu $t0,$s1,$t3
+addu $sp,$t0,$sp
+addi $sp,$sp,4
+li $t0,1 
+move $t8,$t0 
+li $t3,0 
+subu $t0,$t7,$t3
+BGTZ $t0 ,label0
+li $s4 ,0
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+j label0  
+label0:    
+li $t3,1 
+subu $t0,$t7,$t3
+BLTZ $t0 ,label1
+addi $sp,$sp,4
+li $s1 ,0
+addi $sp,$sp,12
+li $t3,1 
+subu $t0,$t7,$t3
+sw $t0,0($s5) 
+addi $sp,$sp,4
+lw $t0 ,0($s5)
+sw $t0 ,0($sp)
+li $t3,16 
+subu $sp,$sp,$t3
+lw $t0 ,0($s5)
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,4($s3) 
+jal getn  
+lw $t7,0($s3) 
+lw $t8,4($s3) 
+addi $t3,$s3,8
+sw $s4 ,0($t3)
+lw $t0,8($s3) 
+addu $t0,$t0,$t8
+sw $t0,4($s5) 
+lw $s4 ,4($s5)
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+j label1  
+label1:    
+li $s4 ,0
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+dag:    
+sw $s0 ,4($sp)
+addi $sp,$sp,4
+move $s0 ,$sp
+sw $ra ,4($sp)
+addi $sp,$sp,4
+sw $s3 ,4($sp)
+addi $sp,$sp,8
+move $s3 ,$sp
+lw $t7,0($s3) 
+lw $t8,8($s3) 
+lw $t9,12($s3) 
+li $t3,4 
+subu $t0,$s1,$t3
+addu $sp,$t0,$sp
+addi $sp,$sp,20
+li $t0,0 
+move $t7,$t0 
+li $t0,0 
+move $t9,$t0 
+li $t0,0 
+move $t8,$t0 
+li $t0,0 
+sw $t0,4($s3) 
+label2:    
+addi $sp,$sp,4
+li $s1 ,0
+addi $sp,$sp,16
+lw $t0 ,0($s2)
+sw $t0 ,0($sp)
+li $t3,16 
+subu $sp,$sp,$t3
+lw $t0 ,0($s2)
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,8($s3) 
+sw $t9,12($s3) 
+jal getn  
+lw $t7,0($s3) 
+lw $t8,8($s3) 
+lw $t9,12($s3) 
+addi $t3,$s3,20
+sw $s4 ,0($t3)
+lw $t0,20($s3) 
+li $t3,3 
+subu $t0,$t0,$t3
+sw $t0,8($s5) 
+lw $t3,8($s5) 
+subu $t0,$t7,$t3
+BGEZ $t0 ,label3
+move $t0,$t7 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,12($s5)
+lw $t0,4($s3) 
+lw $t3,12($s5) 
+addu $t0,$t0,$t3
+sw $t0,16($s5) 
+lw $t0,16($s5) 
+sw $t0,4($s3) 
+addi $t0,$t7,1
+sw $t0,20($s5) 
+lw $t0 ,20($s5)
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,24($s5)
+lw $t3,24($s5) 
+addu $t0,$t8,$t3
+sw $t0,28($s5) 
+lw $t0,28($s5) 
+move $t8,$t0 
+addi $t0,$t7,2
+sw $t0,32($s5) 
+lw $t0 ,32($s5)
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,36($s5)
+lw $t3,36($s5) 
+addu $t0,$t9,$t3
+sw $t0,40($s5) 
+lw $t0,40($s5) 
+move $t9,$t0 
+addi $t0,$t7,3
+sw $t0,44($s5) 
+lw $t0,44($s5) 
+move $t7,$t0 
+j label2  
+label3:    
+li $t0,3 
+sw $t0,16($s3) 
+li $t0,0 
+move $t7,$t0 
+label4:    
+li $t3,100 
+subu $t0,$t7,$t3
+BGEZ $t0 ,label5
+sw $t9,192($s5) 
+sw $t8,188($s5) 
+lw $t0,188($s5) 
+li $t1,2 
+mult  $t0,$t1
+li $t0,0 
+mflo $t1  
+addu $t0,$t0,$t1
+sw $t0,56($s5) 
+lw $t0,4($s3) 
+sw $t0,196($s5) 
+lw $t0,196($s5) 
+lw $t3,16($s3) 
+mult  $t0,$t3
+li $t0,0 
+mflo $t1  
+addu $t0,$t0,$t1
+sw $t0,48($s5) 
+lw $t0,48($s5) 
+lw $t3,192($s5) 
+addu $t0,$t0,$t3
+sw $t0,52($s5) 
+lw $t0,52($s5) 
+lw $t3,56($s5) 
+subu $t8,$t0,$t3
+li $t1,2 
+mult  $t8,$t1
+li $t0,0 
+mflo $t1  
+addu $t0,$t0,$t1
+sw $t0,72($s5) 
+lw $t0,48($s5) 
+lw $t3,192($s5) 
+subu $t0,$t0,$t3
+sw $t0,68($s5) 
+lw $t0,68($s5) 
+lw $t3,72($s5) 
+addu $t9,$t0,$t3
+lw $t0,48($s5) 
+addu $t0,$t0,$t9
+sw $t0,84($s5) 
+lw $t0,84($s5) 
+lw $t3,72($s5) 
+subu $t0,$t0,$t3
+sw $t0,4($s3) 
+sw $t7,200($s5) 
+lw $t0,200($s5) 
+addi $t7,$t0,1
+j label4  
+label5:    
+la $a0 ,msg1
+li $v0 ,4
+syscall    
+lw $a0 ,4($s3)
+li $v0 ,1
+syscall    
+la $a0 ,msg2
+li $v0 ,4
+syscall    
+move $a0,$t8 
+li $v0 ,1
+syscall    
+la $a0 ,msg3
+li $v0 ,4
+syscall    
+move $a0,$t9 
+li $v0 ,1
+syscall    
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+quicksort:    
+sw $s0 ,4($sp)
+addi $sp,$sp,4
+move $s0 ,$sp
+sw $ra ,4($sp)
+addi $sp,$sp,4
+sw $s3 ,4($sp)
+addi $sp,$sp,8
+move $s3 ,$sp
+lw $t7,4($s3) 
+lw $t8,0($s3) 
+lw $t9,12($s3) 
+li $t3,4 
+subu $t0,$s1,$t3
+addu $sp,$t0,$sp
+addi $sp,$sp,16
+move $t9,$t7 
+sw $t8,8($s3) 
+addu $t0,$t8,$t7
+sw $t0,100($s5) 
+lw $t0,100($s5) 
+li $t1,2 
+div  $t0,$t1
+mflo $t0  
+sw $t0,104($s5) 
+lw $t0 ,104($s5)
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,108($s5)
+lw $t0,108($s5) 
+sw $t0,16($s3) 
+label6:    
+lw $t0,8($s3) 
+subu $t0,$t0,$t9
+BGTZ $t0 ,label12
+label7:    
+move $t0,$t9 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,112($s5)
+lw $t0,16($s3) 
+lw $t3,112($s5) 
+subu $t0,$t0,$t3
+BLEZ $t0 ,label8
+sw $t9,204($s5) 
+lw $t0,204($s5) 
+li $t3,1 
+subu $t9,$t0,$t3
+j label7  
+label8:    
+label9:    
+lw $t0 ,8($s3)
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,120($s5)
+lw $t0,16($s3) 
+lw $t3,120($s5) 
+subu $t0,$t0,$t3
+BGEZ $t0 ,label10
+lw $t0,8($s3) 
+sw $t0,208($s5) 
+lw $t0,208($s5) 
+addi $t0,$t0,1
+sw $t0,8($s3) 
+j label9  
+label10:    
+lw $t0,8($s3) 
+subu $t0,$t0,$t9
+BGTZ $t0 ,label11
+lw $t0 ,8($s3)
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,128($s5)
+lw $t0,128($s5) 
+sw $t0,20($s3) 
+move $t0,$t9 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,132($s5)
+lw $t0,132($s5) 
+lw $t3,8($s3) 
+sll $t3,$t3,2
+li $t4,4 
+addu $t4,$t4,$t3
+addu $t4,$t4,$s2
+sw $t0,0($t4) 
+lw $t0,20($s3) 
+move $t3,$t9 
+sll $t3,$t3,2
+li $t4,4 
+addu $t4,$t4,$t3
+addu $t4,$t4,$s2
+sw $t0,0($t4) 
+lw $t0,8($s3) 
+sw $t0,212($s5) 
+lw $t0,212($s5) 
+addi $t0,$t0,1
+sw $t0,8($s3) 
+sw $t9,216($s5) 
+lw $t0,216($s5) 
+li $t3,1 
+subu $t9,$t0,$t3
+j label11  
+label11:    
+j label6  
+label12:    
+lw $t0,8($s3) 
+subu $t0,$t0,$t7
+BGEZ $t0 ,label13
+lw $t0 ,8($s3)
+sw $t0 ,16($sp)
+move $t0,$t7 
+sw $t0 ,20($sp)
+li $s1 ,8
+sw $t7,4($s3) 
+sw $t8,0($s3) 
+sw $t9,12($s3) 
+jal quicksort  
+lw $t7,4($s3) 
+lw $t8,0($s3) 
+lw $t9,12($s3) 
+j label13  
+label13:    
+subu $t0,$t8,$t9
+BGEZ $t0 ,label14
+move $t0,$t8 
+sw $t0 ,16($sp)
+move $t0,$t9 
+sw $t0 ,20($sp)
+li $s1 ,8
+sw $t7,4($s3) 
+sw $t8,0($s3) 
+sw $t9,12($s3) 
+jal quicksort  
+lw $t7,4($s3) 
+lw $t8,0($s3) 
+lw $t9,12($s3) 
+j label14  
+label14:    
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+print_list:    
+sw $s0 ,4($sp)
+addi $sp,$sp,4
+move $s0 ,$sp
+sw $ra ,4($sp)
+addi $sp,$sp,4
+sw $s3 ,4($sp)
+addi $sp,$sp,8
+move $s3 ,$sp
+lw $t7,4($s3) 
+li $t3,4 
+subu $t0,$s1,$t3
+addu $sp,$t0,$sp
+addi $sp,$sp,4
+li $t0,0 
+move $t7,$t0 
+label15:    
+lw $t3,0($s3) 
+subu $t0,$t7,$t3
+BGEZ $t0 ,label19
+li $t3,1 
+BNE $t7,$t3,label16
+la $a0 ,msg4
+li $v0 ,4
+syscall    
+move $t0,$t7 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,144($s5)
+lw $a0 ,144($s5)
+li $v0 ,1
+syscall    
+j label16  
+label16:    
+li $t3,7 
+BNE $t7,$t3,label17
+la $a0 ,msg5
+li $v0 ,4
+syscall    
+move $t0,$t7 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,148($s5)
+lw $a0 ,148($s5)
+li $v0 ,1
+syscall    
+j label17  
+label17:    
+li $t3,12 
+BNE $t7,$t3,label18
+la $a0 ,msg6
+li $v0 ,4
+syscall    
+move $t0,$t7 
+sll $t0,$t0,2
+addu $t0,$t0,$s2
+li $t1 ,4
+addu $t0,$t0,$t1
+lw $t0 ,0($t0)
+sw $t0 ,152($s5)
+lw $a0 ,152($s5)
+li $v0 ,1
+syscall    
+j label18  
+label18:    
+move $t8,$t7 
+addi $t7,$t8,1
+j label15  
+label19:    
+move $sp ,$s0
+lw $t0 ,0($sp)
+move $s0 ,$t0
+lw $t0 ,4($sp)
+move $ra ,$t0
+lw $t0 ,8($sp)
+move $s3 ,$t0
+li $t3,4 
+subu $sp,$sp,$t3
+jr $ra  
+main:    
+addi $sp,$sp,16
+move $s3 ,$sp
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+li $t3,4 
+subu $sp,$sp,$t3
+addi $sp,$sp,4
+li $t0,0 
+move $t7,$t0 
+label20:    
+addi $sp,$sp,4
+li $s1 ,0
+addi $sp,$sp,16
+move $t0,$t8 
+sw $t0 ,0($sp)
+li $t3,16 
+subu $sp,$sp,$t3
+move $t0,$t8 
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal getn  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+addi $t3,$s3,4
+sw $s4 ,0($t3)
+lw $t3,4($s3) 
+subu $t0,$t7,$t3
+BGEZ $t0 ,label21
+li $t1,99 
+mult  $t7,$t1
+li $t0,0 
+mflo $t1  
+addu $t0,$t0,$t1
+move $t9,$t0 
+move $t3,$t7 
+sll $t3,$t3,2
+li $t4,4 
+addu $t4,$t4,$t3
+addu $t4,$t4,$s2
+sw $t9,0($t4) 
+addi $t0,$t7,2
+sw $t0,164($s5) 
+lw $t0,164($s5) 
+move $t7,$t0 
+j label20  
+label21:    
+li $t0,1 
+move $t7,$t0 
+label22:    
+addi $sp,$sp,4
+li $s1 ,0
+addi $sp,$sp,16
+move $t0,$t8 
+sw $t0 ,0($sp)
+li $t3,16 
+subu $sp,$sp,$t3
+move $t0,$t8 
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal getn  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+addi $t3,$s3,8
+sw $s4 ,0($t3)
+lw $t3,8($s3) 
+subu $t0,$t7,$t3
+BGEZ $t0 ,label23
+subu $t0,$t8,$t7
+sw $t0,168($s5) 
+lw $t0,168($s5) 
+li $t1,99 
+mult  $t0,$t1
+li $t0,0 
+mflo $t1  
+addu $t0,$t0,$t1
+sw $t0,172($s5) 
+lw $t0,172($s5) 
+move $t3,$t7 
+sll $t3,$t3,2
+li $t4,4 
+addu $t4,$t4,$t3
+addu $t4,$t4,$s2
+sw $t0,0($t4) 
+addi $t0,$t7,2
+sw $t0,176($s5) 
+lw $t0,176($s5) 
+move $t7,$t0 
+j label22  
+label23:    
+la $a0 ,msg7
+li $v0 ,4
+syscall    
+move $t0,$t8 
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal print_list  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+li $t0 ,0
+sw $t0 ,16($sp)
+li $t3,1 
+subu $t0,$t8,$t3
+sw $t0,180($s5) 
+lw $t0 ,180($s5)
+sw $t0 ,20($sp)
+li $s1 ,8
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal quicksort  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+la $a0 ,msg8
+li $v0 ,4
+syscall    
+move $t0,$t8 
+sw $t0 ,16($sp)
+li $s1 ,4
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal print_list  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
+sw $t7,0($s3) 
+sw $t8,0($s2) 
+sw $t9,160($s5) 
+jal dag  
+lw $t7,0($s3) 
+lw $t8,0($s2) 
+lw $t9,160($s5) 
